@@ -5,8 +5,7 @@ import 'package:fitness_app/feature/home/presentation/view_model/home_cubit.dart
 import 'package:fitness_app/generated/locale_keys.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-
+import 'package:shimmer/shimmer.dart';
 /// this the static data waiting for api response to be future
 /// can be get from shared preference but not in this case
 class InfoSection extends StatefulWidget {
@@ -25,7 +24,9 @@ class _InfoSectionState extends State<InfoSection> {
       builder: (context, state) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Skeletonizer(
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey.shade300,
+            highlightColor: Colors.grey.shade100,
             enabled: state.isDataInfoLoading,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

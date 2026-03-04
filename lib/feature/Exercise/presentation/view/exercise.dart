@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:fitness_app/core/constants/app_assets.dart';
 import 'package:fitness_app/core/constants/app_colors.dart';
 import 'package:fitness_app/core/constants/app_values.dart';
@@ -7,11 +6,11 @@ import 'package:fitness_app/core/extensions/media_query_extensions.dart';
 import 'package:fitness_app/feature/Exercise/presentation/view_model/exercise_state.dart';
 import 'package:fitness_app/feature/Exercise/presentation/view_model/exercise_cubit.dart';
 import 'package:fitness_app/feature/Exercise/presentation/widgets/build_sector.dart';
-import 'package:fitness_app/feature/Exercise/presentation/widgets/custom_youtube_player.dart';
 import 'package:fitness_app/feature/Exercise/presentation/widgets/exercise_list_view.dart';
 import 'package:fitness_app/feature/auth/presentation/widgets/pop_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ExerciseScreen extends StatefulWidget {
   const ExerciseScreen({super.key, required this.primeMoverId, this.injectedCubit});
@@ -46,8 +45,9 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
     final difficultyId = difficultyMap[selectedDifficulty]!;
 
     await cubit.fetchExercises(
-      muscleId:
-          widget.primeMoverId.isEmpty ? '67c8499726895f87ce0aa9be' : widget.primeMoverId,
+      muscleId: widget.primeMoverId.isEmpty
+          ? '67c8499726895f87ce0aa9be'
+          : widget.primeMoverId,
       difficultyId: difficultyId,
     );
 
@@ -57,6 +57,24 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
       cubit.setSelectedExercise(
         name: first.name,
         videoUrl: first.videoUrl!,
+      );
+    }
+  }
+
+  Future<void> openYoutubeVideo(String videoUrl) async {
+    String fullUrl = videoUrl;
+
+    // لو الفيديو مش رابط كامل
+    if (!videoUrl.startsWith('http')) {
+      fullUrl = 'https://www.youtube.com/watch?v=$videoUrl';
+    }
+
+    final uri = Uri.parse(fullUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot open YouTube video')),
       );
     }
   }
@@ -108,11 +126,8 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                             ),
                           ),
                           Positioned.fill(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                              child: Container(
-                                color: AppColors.darkBackground.withValues(alpha: 0.7),
-                              ),
+                            child: Container(
+                              color: AppColors.darkBackground.withOpacity(0.7),
                             ),
                           ),
                           Positioned(
@@ -128,24 +143,8 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                           ),
                           if (state.currentVideoUrl != null)
                             GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  barrierColor: Colors.black.withValues(alpha: 0.95),
-                                  builder: (_) => GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () => Navigator.of(context).pop(),
-                                    child: Scaffold(
-                                      backgroundColor: Colors.black,
-                                      body: SafeArea(
-                                        child: Center(
-                                          child: CustomYoutubePlayer(
-                                              videoUrl: state.currentVideoUrl!),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                );
+                              onTap: () async {
+                                await openYoutubeVideo(state.currentVideoUrl!);
                               },
                               child: const Icon(Icons.play_arrow,
                                   size: 50, color: AppColors.orange),
@@ -153,7 +152,8 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                           Positioned(
                             left: 15,
                             top: 15,
-                            child: popWidget(context, () => Navigator.of(context).pop()),
+                            child: popWidget(context,
+                                    () => Navigator.of(context).pop()),
                           ),
                         ],
                       ),
@@ -172,7 +172,8 @@ class _ExerciseScreenState extends State<ExerciseScreen> {
                     itemCount: difficultyMap.length,
                     onPageChanged: (index) async {
                       setState(() {
-                        selectedDifficulty = difficultyMap.keys.elementAt(index);
+                        selectedDifficulty =
+                            difficultyMap.keys.elementAt(index);
                       });
                       await fetchByDifficulty();
                     },

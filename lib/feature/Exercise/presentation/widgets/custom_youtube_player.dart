@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class CustomYoutubePlayer extends StatefulWidget {
   const CustomYoutubePlayer({super.key, required this.videoUrl});
@@ -10,33 +10,31 @@ class CustomYoutubePlayer extends StatefulWidget {
 }
 
 class _CustomYoutubePlayerState extends State<CustomYoutubePlayer> {
-  late YoutubePlayerController _controller;
+  late final YoutubePlayerController _controller;
 
   @override
   void initState() {
     super.initState();
-    final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+
+    final videoId =
+    YoutubePlayerController.convertUrlToId(widget.videoUrl);
+
     _controller = YoutubePlayerController(
-      initialVideoId: videoId!,
-      flags: const YoutubePlayerFlags(
-        autoPlay: false,
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: true,
         mute: false,
       ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+    )..loadVideoById(videoId: videoId!);
   }
 
   @override
   Widget build(BuildContext context) {
-    return YoutubePlayer(
-      controller: _controller,
-      showVideoProgressIndicator: true,
-      progressIndicatorColor: Colors.red,
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: YoutubePlayer(
+        controller: _controller,
+      ),
     );
   }
 }

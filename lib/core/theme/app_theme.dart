@@ -14,7 +14,7 @@ class AppTheme {
     secondaryHeaderColor: AppColors.redOrange,
     fontFamily: AppFontsFamily.balooThambi2,
     // fontFamily: AppFontsFamily.supermercadoOne,
-    dialogTheme: DialogTheme(
+    dialogTheme: DialogThemeData(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
       ),

@@ -10,7 +10,7 @@ import 'package:fitness_app/feature/profile/presentation/widgets/custom_text_for
 import 'package:fitness_app/generated/locale_keys.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+import 'package:shimmer/shimmer.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({required this.profileCubit, super.key});
@@ -106,7 +106,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ],
                   );
                 }
-                return Skeletonizer(
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey.shade300,
+                  highlightColor: Colors.grey.shade100,
                   enabled: state.isGetProfileLoading,
                   child: SingleChildScrollView(
                     child: Column(
