@@ -25,7 +25,9 @@ class RegisterScreen extends StatefulWidget {
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen>  with AutomaticKeepAliveClientMixin<RegisterScreen> {
+  bool get wantKeepAlive => true;
+
   late RegisterCubit cubit;
 
   @override

@@ -15,7 +15,7 @@ abstract class AppToast {
       title: Text(title),
       description: Text(description),
       primaryColor: Colors.white,
-      autoCloseDuration: const Duration(seconds: 3),
+      autoCloseDuration: const Duration(seconds: 10),
       progressBarTheme: ProgressIndicatorThemeData(
         color: type == ToastificationType.success
             ? AppColors.darkBackground

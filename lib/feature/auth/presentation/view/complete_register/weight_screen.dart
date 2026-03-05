@@ -21,6 +21,8 @@ class WeightScreen extends StatefulWidget {
 late RegisterCubit cubit;
 
 class _WeightScreenState extends State<WeightScreen> {
+  bool get wantKeepAlive => true;
+
   late int weight;
   late ScrollController _scrollController;
   late double itemWidth;
@@ -42,6 +44,7 @@ class _WeightScreenState extends State<WeightScreen> {
   }
 
   void _onScroll() {
+    if (!mounted) return;
     final offset =
         _scrollController.offset + MediaQuery.of(context).size.width / 2 - itemWidth / 2;
     final index = (offset / itemWidth).round();

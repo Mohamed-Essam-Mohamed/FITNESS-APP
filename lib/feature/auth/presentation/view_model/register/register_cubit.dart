@@ -12,13 +12,11 @@ import 'package:fitness_app/feature/auth/presentation/view_model/models/collecti
 class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit(this.registerUseCase) : super(const RegisterState());
   final RegisterUseCase registerUseCase;
-
   final TextEditingController firstName = TextEditingController();
   final TextEditingController lastName = TextEditingController();
   final TextEditingController email = TextEditingController();
   final TextEditingController password = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
   String gender = 'male';
   int age = 25;
   int weight = 80;
@@ -56,8 +54,11 @@ class RegisterCubit extends Cubit<RegisterState> {
       ));
     } else if (result is FailureResult<String>) {
       final error = result.exception.toString();
-      final cleanMessage =
-          error.contains('-') ? error.split('-').sublist(1).join('-').trim() : error;
+      final cleanMessage = error.toLowerCase().contains('unexpected error')
+          ? error.contains('-')
+          ? error.split('-').sublist(1).join('-').trim()
+          : error
+          : error;
 
       emit(state.copyWith(
         status: RegisterStatus.failure,
