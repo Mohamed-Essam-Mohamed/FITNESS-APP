@@ -25,7 +25,11 @@ late SmartCoachCubit cubit;
 class _SmartCoachScreenState extends State<SmartCoachScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+
   bool _showSidebar = false;
+  double _menuOffset = 0.0;
+  late double _menuWidth;
+
   @override
   void initState() {
     super.initState();
@@ -55,8 +59,41 @@ class _SmartCoachScreenState extends State<SmartCoachScreen> {
     }
   }
 
+  // السحب لليمين لإغلاق فقط
+  void _onMenuDragUpdate(double delta) {
+    if (delta > 0) {
+      setState(() {
+        _menuOffset += delta;
+        _menuOffset = _menuOffset.clamp(-_menuWidth, 0.0);
+      });
+    }
+  }
+
+  void _onMenuDragEnd() {
+    if (_menuOffset > -_menuWidth / 2) {
+      // أغلق القائمة
+      setState(() {
+        _menuOffset = -_menuWidth;
+        _showSidebar = false;
+      });
+    } else {
+      // خليها مفتوحة
+      setState(() {
+        _menuOffset = 0;
+        _showSidebar = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _menuWidth = MediaQuery.of(context).size.width * 0.8;
+
+    // اجعل القائمة مغلقة عند البداية
+    if (!_showSidebar && _menuOffset == 0.0) {
+      _menuOffset = -_menuWidth;
+    }
+
     return BlocProvider(
       create: (_) => serviceLocator<SmartCoachCubit>(),
       child: Builder(
@@ -69,20 +106,28 @@ class _SmartCoachScreenState extends State<SmartCoachScreen> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 30),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             popWidget(context, () {
                               Navigator.of(context).pop();
                             }),
-                            Text(LocaleKeys.smart_coach_title.tr(),
-                                style: AppTheme.lightTheme.textTheme.titleLarge
-                                    ?.copyWith(color: Colors.white)),
+                            Text(
+                              LocaleKeys.smart_coach_title.tr(),
+                              style: AppTheme.lightTheme.textTheme.titleLarge
+                                  ?.copyWith(color: Colors.white),
+                            ),
                             IconButton(
                               icon: const Icon(Icons.menu, color: Colors.white),
-                              onPressed: () =>
-                                  setState(() => _showSidebar = !_showSidebar),
+                              onPressed: () {
+                                // افتح القائمة فقط عند الضغط على الزرار
+                                setState(() {
+                                  _showSidebar = true;
+                                  _menuOffset = 0.0;
+                                });
+                              },
                             ),
                           ],
                         ),
@@ -90,9 +135,6 @@ class _SmartCoachScreenState extends State<SmartCoachScreen> {
                       Expanded(
                         child: BlocConsumer<SmartCoachCubit, SmartCoachChatState>(
                           listener: (context, state) {
-                            if (state.errorMessage != null &&
-                                state.errorMessage!.isNotEmpty) {}
-
                             WidgetsBinding.instance.addPostFrameCallback((_) {
                               if (_scrollController.hasClients) {
                                 _scrollController.animateTo(
@@ -135,13 +177,13 @@ class _SmartCoachScreenState extends State<SmartCoachScreen> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 20, vertical: 15),
                                           margin:
-                                              const EdgeInsets.symmetric(horizontal: 8),
+                                          const EdgeInsets.symmetric(horizontal: 8),
                                           decoration: BoxDecoration(
                                             color: isBot
                                                 ? AppColors.gray
-                                                    .withAlpha((0.07 * 255).toInt())
+                                                .withAlpha((0.07 * 255).toInt())
                                                 : AppColors.orange
-                                                    .withAlpha((0.6 * 255).toInt()),
+                                                .withAlpha((0.6 * 255).toInt()),
                                             borderRadius: BorderRadius.only(
                                               bottomLeft: const Radius.circular(20),
                                               bottomRight: const Radius.circular(20),
@@ -159,7 +201,7 @@ class _SmartCoachScreenState extends State<SmartCoachScreen> {
                                         CircleAvatar(
                                           radius: 25,
                                           backgroundImage:
-                                              NetworkImage(cubit.state.photo.toString()),
+                                          NetworkImage(cubit.state.photo.toString()),
                                           backgroundColor: Colors.transparent,
                                         ),
                                       if (isBot) const SizedBox(width: 40),
@@ -177,7 +219,7 @@ class _SmartCoachScreenState extends State<SmartCoachScreen> {
 
                           return Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             child: Row(
                               children: [
                                 Expanded(
@@ -207,11 +249,11 @@ class _SmartCoachScreenState extends State<SmartCoachScreen> {
                                 IconButton(
                                   icon: isLoading
                                       ? const SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2, color: Colors.white),
-                                        )
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white),
+                                  )
                                       : const Icon(Icons.send, color: Colors.white),
                                   onPressed: isLoading ? null : () => _sendMessage(ctx),
                                 ),
@@ -225,16 +267,32 @@ class _SmartCoachScreenState extends State<SmartCoachScreen> {
                 ),
               ),
             ),
+            // Sidebar draggable
             AnimatedPositioned(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOut,
               top: 0,
               bottom: 0,
-              right: _showSidebar ? 0 : -MediaQuery.of(context).size.width * 0.8,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: PreviousConversationsMenu(
-                  onConversationSelected: () => setState(() => _showSidebar = false),
+              right: _menuOffset,
+              child: GestureDetector(
+                onHorizontalDragUpdate: (details) {
+                  if (details.delta.dx > 0) {
+                    _onMenuDragUpdate(details.delta.dx);
+                  }
+                },
+                onHorizontalDragEnd: (_) {
+                  _onMenuDragEnd();
+                },
+                child: SizedBox(
+                  width: _menuWidth,
+                  child: PreviousConversationsMenu(
+                    onConversationSelected: () {
+                      setState(() {
+                        _showSidebar = false;
+                        _menuOffset = -_menuWidth;
+                      });
+                    },
+                  ),
                 ),
               ),
             ),
