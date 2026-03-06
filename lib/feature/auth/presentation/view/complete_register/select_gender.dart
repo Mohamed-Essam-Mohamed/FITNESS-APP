@@ -29,7 +29,6 @@ class _SelectGenderState extends State<SelectGender> {
     super.initState();
     cubit = context.read<RegisterCubit>();
 
-    // Set default selection to male
     selectedGender = 'male';
     cubit.gender = 'male';
   }
@@ -43,6 +42,9 @@ class _SelectGenderState extends State<SelectGender> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +59,7 @@ class _SelectGenderState extends State<SelectGender> {
           ),
           SizedBox(height: context.hp(3)),
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
             child: AnimationText(
               child: Text(
                 LocaleKeys.Authentication_tellUsAboutYourself.tr(),
@@ -66,12 +68,13 @@ class _SelectGenderState extends State<SelectGender> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
             child: AnimationText(
               millDelay: 1200,
               child: Text(
                 LocaleKeys.Authentication_tellUsDescription.tr(),
-                style: AppTheme.lightTheme.textTheme.titleMedium!.copyWith(fontSize: 16),
+                style: AppTheme.lightTheme.textTheme.titleMedium!
+                    .copyWith(fontSize: screenHeight * 0.022),
                 textAlign: TextAlign.start,
               ),
             ),
@@ -82,13 +85,14 @@ class _SelectGenderState extends State<SelectGender> {
               children: [
                 SizedBox(height: context.hp(3)),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    // Male
                     GestureDetector(
                       onTap: () => _onGenderSelected('male'),
                       child: Container(
-                        width: context.wp(23),
-                        height: context.hp(13),
+                        width: screenWidth * 0.23,
+                        height: screenHeight * 0.13,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -108,7 +112,7 @@ class _SelectGenderState extends State<SelectGender> {
                               child: Icon(
                                 Icons.male,
                                 color: AppColors.white,
-                                size: context.sp(50),
+                                size: screenHeight * 0.07,
                               ),
                             ),
                             Text(
@@ -120,62 +124,65 @@ class _SelectGenderState extends State<SelectGender> {
                         ),
                       ),
                     ),
+                    // Female
+                    GestureDetector(
+                      onTap: () => _onGenderSelected('female'),
+                      child: Container(
+                        width: screenWidth * 0.23,
+                        height: screenHeight * 0.13,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: selectedGender == 'female'
+                                ? AppColors.orange
+                                : AppColors.white.withAlpha((0.8 * 255).toInt()),
+                          ),
+                          color: selectedGender == 'female'
+                              ? AppColors.orange
+                              : Colors.transparent,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.female,
+                              color: AppColors.white,
+                              size: screenHeight * 0.07,
+                            ),
+                            Text(
+                              LocaleKeys.Authentication_genderFemale.tr(),
+                              style: AppTheme.lightTheme.textTheme.bodyMedium!
+                                  .copyWith(color: AppColors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-                SizedBox(height: context.hp(2.5)),
-                GestureDetector(
-                  onTap: () => _onGenderSelected('female'),
-                  child: Container(
-                    width: context.wp(23),
-                    height: context.hp(13),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: selectedGender == 'female'
-                            ? AppColors.orange
-                            : AppColors.white.withAlpha((0.8 * 255).toInt()),
-                      ),
-                      color: selectedGender == 'female'
-                          ? AppColors.orange
-                          : Colors.transparent,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.female,
-                          color: AppColors.white,
-                          size: context.sp(50),
-                        ),
-                        Text(
-                          LocaleKeys.Authentication_genderFemale.tr(),
-                          style: AppTheme.lightTheme.textTheme.bodyMedium!
-                              .copyWith(color: AppColors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                SizedBox(height: context.hp(3)),
                 BounceInDown(
                   delay: const Duration(milliseconds: 700),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(38),
+                      minimumSize: Size(double.infinity, screenHeight * 0.06),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(screenHeight * 0.03),
                       ),
                     ),
                     onPressed: selectedGender == null
                         ? null
                         : () {
-                            cubit.gender = selectedGender!;
-                            widget.pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                    child: Text(LocaleKeys.Authentication_next.tr()),
+                      cubit.gender = selectedGender!;
+                      widget.pageController.nextPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: Text(
+                      LocaleKeys.Authentication_next.tr(),
+                      style: AppTheme.lightTheme.textTheme.labelLarge,
+                    ),
                   ),
                 )
               ],

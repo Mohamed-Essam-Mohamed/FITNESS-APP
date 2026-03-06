@@ -14,6 +14,7 @@ import 'package:fitness_app/generated/locale_keys.g.dart';
 class HeightScreen extends StatefulWidget {
   const HeightScreen({super.key, required this.pageController});
   final PageController pageController;
+
   @override
   State<HeightScreen> createState() => _HeightScreenState();
 }
@@ -31,9 +32,11 @@ class _HeightScreenState extends State<HeightScreen> {
   @override
   void initState() {
     super.initState();
+
     _scrollController = ScrollController();
     cubit = context.read<RegisterCubit>();
     height = cubit.height;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToHeight(height);
       _scrollController.addListener(_onScroll);
@@ -43,11 +46,15 @@ class _HeightScreenState extends State<HeightScreen> {
   void _onScroll() {
     final offset =
         _scrollController.offset + MediaQuery.of(context).size.width / 2 - itemWidth / 2;
+
     final index = (offset / itemWidth).round();
 
     final newHeight = (index - paddingItems + 1).clamp(1, numbersCount);
+
     if (newHeight != height) {
-      setState(() => height = newHeight);
+      setState(() {
+        height = newHeight;
+      });
     }
   }
 
@@ -55,6 +62,7 @@ class _HeightScreenState extends State<HeightScreen> {
     final offset = ((height - 1 + paddingItems) * itemWidth) -
         MediaQuery.of(context).size.width / 2 +
         itemWidth / 2;
+
     _scrollController.jumpTo(offset);
   }
 
@@ -75,6 +83,7 @@ class _HeightScreenState extends State<HeightScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: context.hp(9)),
+
           Align(
             alignment: Alignment.center,
             child: BounceInDown(
@@ -82,9 +91,11 @@ class _HeightScreenState extends State<HeightScreen> {
               child: const CircularPercentIndicatorWidget(index: 4),
             ),
           ),
+
           SizedBox(height: context.hp(3)),
+
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: const EdgeInsetsDirectional.only(start: 20),
             child: AnimationText(
               child: Text(
                 LocaleKeys.Authentication_whatIsYourHeight.tr(),
@@ -92,18 +103,21 @@ class _HeightScreenState extends State<HeightScreen> {
               ),
             ),
           ),
+
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: const EdgeInsetsDirectional.only(start: 20),
             child: AnimationText(
               millDelay: 1200,
               child: Text(
                 LocaleKeys.Authentication_goalDescription.tr(),
-                style: AppTheme.lightTheme.textTheme.titleMedium!.copyWith(fontSize: 16),
+                style: AppTheme.lightTheme.textTheme.titleMedium!
+                    .copyWith(fontSize: 16),
               ),
             ),
           ),
+
           SizedBox(height: context.hp(2)),
-          //!
+
           CustomAuthContainer(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -115,6 +129,7 @@ class _HeightScreenState extends State<HeightScreen> {
                     fontSize: 10,
                   ),
                 ),
+
                 SizedBox(
                   height: context.hp(13),
                   child: ListView.builder(
@@ -129,13 +144,19 @@ class _HeightScreenState extends State<HeightScreen> {
                       }
 
                       final number = realIndex + 1;
+
                       final viewportCenter = _scrollController.offset +
                           MediaQuery.of(context).size.width / 2;
+
                       final itemCenter = index * itemWidth + itemWidth / 2;
 
-                      final distanceFromCenter = (viewportCenter - itemCenter).abs();
+                      final distanceFromCenter =
+                      (viewportCenter - itemCenter).abs();
+
                       final scale =
-                          (1.0 - (distanceFromCenter / (itemWidth * 4))).clamp(0.5, 1.0);
+                      (1.0 - (distanceFromCenter / (itemWidth * 4)))
+                          .clamp(0.5, 1.0);
+
                       final fontSize = 36.0 * scale;
 
                       return Container(
@@ -145,23 +166,32 @@ class _HeightScreenState extends State<HeightScreen> {
                           number.toString(),
                           style: TextStyle(
                             fontSize: fontSize,
+                            fontWeight: FontWeight.w700,
                             color: number == height
                                 ? AppColors.orange
                                 : Colors.white.withAlpha(
-                                    (((1.1 - (distanceFromCenter / (itemWidth * 4)))
-                                                .clamp(0.2, 1.0)) *
-                                            255)
-                                        .round(),
-                                  ),
-                            fontWeight: FontWeight.w700,
+                              (((1.1 -
+                                  (distanceFromCenter /
+                                      (itemWidth * 4)))
+                                  .clamp(0.2, 1.0)) *
+                                  255)
+                                  .round(),
+                            ),
                           ),
                         ),
                       );
                     },
                   ),
                 ),
-                const Icon(Icons.arrow_drop_up, size: 50, color: AppColors.orange),
+
+                const Icon(
+                  Icons.arrow_drop_up,
+                  size: 50,
+                  color: AppColors.orange,
+                ),
+
                 const SizedBox(height: 24),
+
                 BounceInDown(
                   delay: const Duration(milliseconds: 700),
                   child: ElevatedButton(
@@ -170,6 +200,7 @@ class _HeightScreenState extends State<HeightScreen> {
                     ),
                     onPressed: () {
                       cubit.height = height;
+
                       widget.pageController.nextPage(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,

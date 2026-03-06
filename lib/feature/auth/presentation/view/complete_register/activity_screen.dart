@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:fitness_app/core/constants/app_colors.dart';
 import 'package:fitness_app/core/dialogs/app_dialogs.dart';
 import 'package:fitness_app/core/routes/routes.dart';
 import 'package:fitness_app/feature/auth/presentation/view/complete_register/goal_screen.dart';
@@ -19,6 +20,7 @@ import 'package:fitness_app/feature/auth/presentation/view_model/register/regist
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key, required this.pageController});
   final PageController pageController;
+
   @override
   State<ActivityScreen> createState() => _ActivityScreenState();
 }
@@ -34,6 +36,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
     LocaleKeys.Authentication_Advance.tr(),
     LocaleKeys.Authentication_TrueBeast.tr(),
   ];
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +46,9 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return BlocListener<RegisterCubit, RegisterState>(
       bloc: cubit,
       listener: (context, state) {
@@ -66,9 +72,9 @@ class _ActivityScreenState extends State<ActivityScreen> {
         } else if (state.status == RegisterStatus.success) {
           AppToast.showToast(
             context: context,
-            title: 'Successfully create account758741',
-
-            type: ToastificationType.success, description: '',
+            title: 'Successfully created account',
+            type: ToastificationType.success,
+            description: '',
           );
           context.pop();
           context.pushNamedAndRemoveUntil(Routes.login);
@@ -90,21 +96,24 @@ class _ActivityScreenState extends State<ActivityScreen> {
             ),
             SizedBox(height: context.hp(3)),
             Padding(
-              padding: const EdgeInsets.only(left: 20),
+              padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
               child: AnimationText(
                 child: Text(
                   LocaleKeys.Authentication_yourRegularPhysical.tr(),
                   style: AppTheme.lightTheme.textTheme.labelLarge,
+                  textAlign: TextAlign.start,
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 20),
+              padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
               child: AnimationText(
                 millDelay: 1200,
                 child: Text(
                   LocaleKeys.Authentication_activityLevel.tr(),
-                  style: AppTheme.lightTheme.textTheme.labelLarge,
+                  style: AppTheme.lightTheme.textTheme.labelLarge!
+                      .copyWith(fontSize: screenHeight * 0.022),
+                  textAlign: TextAlign.start,
                 ),
               ),
             ),
@@ -113,9 +122,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: context.hp(4),
-                  ),
+                  SizedBox(height: screenHeight * 0.04),
                   ...List.generate(activity.length, (index) {
                     return SelectWidget(
                       title: activity[index],
@@ -127,12 +134,15 @@ class _ActivityScreenState extends State<ActivityScreen> {
                       },
                     );
                   }),
-                  const SizedBox(height: 8),
+                  SizedBox(height: screenHeight * 0.02),
                   BounceInDown(
                     delay: const Duration(milliseconds: 700),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(30),
+                        minimumSize: Size(double.infinity, screenHeight * 0.06),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(screenHeight * 0.03),
+                        ),
                       ),
                       onPressed: () {
                         final level = 'level${selectedIndex + 1}';
@@ -140,13 +150,87 @@ class _ActivityScreenState extends State<ActivityScreen> {
                         cubit.activityLevel = level;
                         cubit.register();
                       },
-                      child: Text(LocaleKeys.Authentication_next.tr()),
+                      child: Text(
+                        LocaleKeys.Authentication_next.tr(),
+                        style: AppTheme.lightTheme.textTheme.labelLarge,
+                      ),
                     ),
                   )
                 ],
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class SelectWidget extends StatelessWidget {
+  const SelectWidget({
+    super.key,
+    required this.title,
+    required this.selected,
+    required this.onTap,
+  });
+  final String title;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: screenHeight * 0.02),
+        child: Container(
+          width: double.infinity,
+          height: screenHeight * 0.06,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1.8,
+              color: Colors.white.withAlpha((0.5 * 255).toInt()),
+            ),
+            color: AppColors.lightGray.withAlpha((0.2 * 255).toInt()),
+            borderRadius: BorderRadius.circular(screenHeight * 0.03),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
+                child: Text(
+                  title,
+                  style: AppTheme.lightTheme.textTheme.bodyMedium!
+                      .copyWith(fontSize: screenHeight * 0.02),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsetsDirectional.only(end: screenWidth * 0.05),
+                child: Container(
+                  height: screenHeight * 0.023,
+                  width: screenHeight * 0.023,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white70, width: 1.5),
+                  ),
+                  child: selected
+                      ? Container(
+                    margin: EdgeInsets.all(screenHeight * 0.003),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.gray,
+                    ),
+                  )
+                      : const SizedBox.shrink(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

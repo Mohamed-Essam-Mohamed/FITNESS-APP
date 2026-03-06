@@ -1,6 +1,5 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:easy_localization/easy_localization.dart';
-
 import 'package:fitness_app/core/constants/app_assets.dart';
 import 'package:fitness_app/core/constants/app_colors.dart';
 import 'package:fitness_app/core/extensions/media_query_extensions.dart';
@@ -9,7 +8,6 @@ import 'package:fitness_app/feature/auth/presentation/view_model/register/regist
 import 'package:fitness_app/feature/auth/presentation/widgets/animation_text.dart';
 import 'package:fitness_app/feature/auth/presentation/widgets/bottom_section.dart';
 import 'package:fitness_app/feature/auth/presentation/widgets/custom_auth_container.dart';
-
 import 'package:fitness_app/feature/auth/presentation/widgets/text_form_widget.dart';
 import 'package:fitness_app/generated/locale_keys.g.dart';
 import 'package:flutter/gestures.dart';
@@ -25,7 +23,7 @@ class RegisterScreen extends StatefulWidget {
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen>  with AutomaticKeepAliveClientMixin<RegisterScreen> {
+class _RegisterScreenState extends State<RegisterScreen> with AutomaticKeepAliveClientMixin<RegisterScreen> {
   bool get wantKeepAlive => true;
 
   late RegisterCubit cubit;
@@ -38,31 +36,25 @@ class _RegisterScreenState extends State<RegisterScreen>  with AutomaticKeepAliv
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final theme = Theme.of(context);
     return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 40),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AnimationText(
-                  child: Text(
-                    LocaleKeys.Authentication_heyThere.tr(),
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
-                AnimationText(
-                  millDelay: 1200,
-                  child: Text(
-                    LocaleKeys.Authentication_createAnAccount.tr(),
-                    style: theme.textTheme.labelLarge,
-                  ),
-                ),
-              ],
+          AnimationText(
+            child: Text(
+              LocaleKeys.Authentication_heyThere.tr(),
+              style: theme.textTheme.titleMedium,
+            ),
+          ),
+          AnimationText(
+            millDelay: 1200,
+            child: Text(
+              LocaleKeys.Authentication_createAnAccount.tr(),
+              style: theme.textTheme.labelLarge,
             ),
           ),
           const SizedBox(height: 20),
@@ -91,9 +83,9 @@ class _RegisterScreenState extends State<RegisterScreen>  with AutomaticKeepAliv
                         child: SvgPicture.asset(SvgAsset.profile),
                       ),
                       hintText: LocaleKeys.Authentication_FirstName.tr(),
+                      errorMaxLines: 3,
                     ),
                   ),
-
                   const SizedBox(height: 16),
 
                   // Last Name
@@ -107,9 +99,9 @@ class _RegisterScreenState extends State<RegisterScreen>  with AutomaticKeepAliv
                         child: SvgPicture.asset(SvgAsset.profile),
                       ),
                       hintText: LocaleKeys.Authentication_LastName.tr(),
+                      errorMaxLines: 3,
                     ),
                   ),
-
                   const SizedBox(height: 16),
 
                   // Email
@@ -123,9 +115,9 @@ class _RegisterScreenState extends State<RegisterScreen>  with AutomaticKeepAliv
                         child: SvgPicture.asset(SvgAsset.mail),
                       ),
                       hintText: LocaleKeys.Authentication_Email.tr(),
+                      errorMaxLines: 3,
                     ),
                   ),
-
                   const SizedBox(height: 16),
 
                   // Password
@@ -137,8 +129,8 @@ class _RegisterScreenState extends State<RegisterScreen>  with AutomaticKeepAliv
                     obscureText: true,
                     hintText: LocaleKeys.Authentication_Password.tr(),
                   ),
-
                   const SizedBox(height: 24),
+
                   const BottomSection(),
                   const SizedBox(height: 24),
 
@@ -163,31 +155,31 @@ class _RegisterScreenState extends State<RegisterScreen>  with AutomaticKeepAliv
                       child: Text(LocaleKeys.Authentication_Register.tr()),
                     ),
                   ),
-
                   const SizedBox(height: 8),
 
                   // Already have account
                   Text.rich(
                     TextSpan(
                       text: LocaleKeys.Authentication_AlreadyHaveAnAccount.tr(),
-                      style: Theme.of(context).textTheme.labelSmall,
+                      style: theme.textTheme.labelSmall,
                       children: [
                         TextSpan(
                           text: LocaleKeys.Authentication_Login.tr(),
-                          style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                                color: AppColors.lightOrange,
-                                decoration: TextDecoration.underline,
-                                decorationColor: AppColors.lightOrange,
-                              ),
+                          style: theme.textTheme.labelMedium!.copyWith(
+                            color: AppColors.lightOrange,
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppColors.lightOrange,
+                          ),
                           recognizer: TapGestureRecognizer()..onTap = () => context.pop(),
                         ),
                       ],
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

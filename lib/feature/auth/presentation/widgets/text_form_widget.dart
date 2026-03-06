@@ -11,30 +11,34 @@ class TextFormWidget extends StatefulWidget {
     required this.suffixIcon,
     required this.prefixIcon,
     this.obscureText = true,
+    this.errorMaxLines = 4,
   });
+
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final String? hintText;
   final String suffixIcon;
   final String prefixIcon;
   final bool obscureText;
+  final int errorMaxLines;
 
   @override
   State<TextFormWidget> createState() => _TextFormWidgetState();
 }
 
 class _TextFormWidgetState extends State<TextFormWidget> {
-  bool isObscure = false;
-  @override
-  void dispose() {
-    widget.controller?.dispose();
-    super.dispose();
-  }
+  late bool isObscure;
 
   @override
   void initState() {
     super.initState();
     isObscure = widget.obscureText;
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.dispose();
+    super.dispose();
   }
 
   @override
@@ -44,7 +48,9 @@ class _TextFormWidgetState extends State<TextFormWidget> {
       validator: widget.validator,
       obscureText: isObscure,
       style: Theme.of(context).textTheme.titleSmall,
+      autovalidateMode: AutovalidateMode.onUserInteraction, // <-- مهم
       decoration: InputDecoration(
+        errorMaxLines: widget.errorMaxLines, // <-- عدد أسطر رسالة الخطأ
         suffixIcon: InkWell(
           onTap: () {
             setState(() {

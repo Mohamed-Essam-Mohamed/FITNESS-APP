@@ -36,12 +36,14 @@ class _GoalScreenState extends State<GoalScreen> {
   void initState() {
     super.initState();
     cubit = context.read<RegisterCubit>();
-
     selectedIndex = cubit.indexGoal;
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,21 +58,24 @@ class _GoalScreenState extends State<GoalScreen> {
           ),
           SizedBox(height: context.hp(3)),
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
             child: AnimationText(
               child: Text(
                 LocaleKeys.Authentication_whatIsYourGoal.tr(),
                 style: AppTheme.lightTheme.textTheme.labelLarge,
+                textAlign: TextAlign.start,
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
             child: AnimationText(
               millDelay: 1200,
               child: Text(
                 LocaleKeys.Authentication_goalDescription.tr(),
-                style: AppTheme.lightTheme.textTheme.titleMedium!.copyWith(fontSize: 16),
+                style: AppTheme.lightTheme.textTheme.titleMedium!
+                    .copyWith(fontSize: screenHeight * 0.02),
+                textAlign: TextAlign.start,
               ),
             ),
           ),
@@ -90,12 +95,15 @@ class _GoalScreenState extends State<GoalScreen> {
                     },
                   );
                 }),
-                const SizedBox(height: 8),
+                SizedBox(height: screenHeight * 0.02),
                 BounceInDown(
                   delay: const Duration(milliseconds: 700),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(30),
+                      minimumSize: Size(double.infinity, screenHeight * 0.06),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(screenHeight * 0.03),
+                      ),
                     ),
                     onPressed: () {
                       final selectedGoal = goals[selectedIndex];
@@ -106,7 +114,10 @@ class _GoalScreenState extends State<GoalScreen> {
                         curve: Curves.easeInOut,
                       );
                     },
-                    child: Text(LocaleKeys.Authentication_next.tr()),
+                    child: Text(
+                      LocaleKeys.Authentication_next.tr(),
+                      style: AppTheme.lightTheme.textTheme.labelLarge,
+                    ),
                   ),
                 )
               ],
@@ -131,48 +142,53 @@ class SelectWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 16),
+        padding: EdgeInsets.only(bottom: screenHeight * 0.02),
         child: Container(
           width: double.infinity,
-          height: 40,
+          height: screenHeight * 0.06,
           decoration: BoxDecoration(
             border: Border.all(
               width: 1.8,
               color: Colors.white.withAlpha((0.5 * 255).toInt()),
             ),
             color: AppColors.lightGray.withAlpha((0.2 * 255).toInt()),
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(screenHeight * 0.03),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 20),
+                padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
                 child: Text(
                   title,
-                  style: AppTheme.lightTheme.textTheme.bodyMedium!.copyWith(fontSize: 15),
+                  style: AppTheme.lightTheme.textTheme.bodyMedium!
+                      .copyWith(fontSize: screenHeight * 0.02),
+                  textAlign: TextAlign.start,
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 20),
+                padding: EdgeInsetsDirectional.only(end: screenWidth * 0.05),
                 child: Container(
-                  height: context.hp(2.3),
-                  width: context.hp(2.3),
+                  height: screenHeight * 0.023,
+                  width: screenHeight * 0.023,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white70, width: 1.5),
                   ),
                   child: selected
                       ? Container(
-                          margin: const EdgeInsets.all(3),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: AppColors.gray,
-                          ),
-                        )
+                    margin: EdgeInsets.all(screenHeight * 0.003),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.gray,
+                    ),
+                  )
                       : const SizedBox.shrink(),
                 ),
               ),

@@ -14,6 +14,7 @@ import 'package:fitness_app/generated/locale_keys.g.dart';
 class OldScreen extends StatefulWidget {
   const OldScreen({super.key, required this.pageController});
   final PageController pageController;
+
   @override
   State<OldScreen> createState() => _OldScreenState();
 }
@@ -21,19 +22,21 @@ class OldScreen extends StatefulWidget {
 late RegisterCubit cubit;
 
 class _OldScreenState extends State<OldScreen> {
-  // default age
   late ScrollController _scrollController;
   late double itemWidth;
   late int age;
+
   final int paddingItems = 3;
   final int numbersCount = 100;
 
   @override
   void initState() {
     super.initState();
+
     _scrollController = ScrollController();
     cubit = context.read<RegisterCubit>();
     age = cubit.age;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _scrollToAge(age);
       _scrollController.addListener(_onScroll);
@@ -43,12 +46,15 @@ class _OldScreenState extends State<OldScreen> {
   void _onScroll() {
     final offset =
         _scrollController.offset + MediaQuery.of(context).size.width / 2 - itemWidth / 2;
+
     final index = (offset / itemWidth).round();
 
     final newAge = (index - paddingItems + 1).clamp(1, numbersCount);
 
     if (newAge != age) {
-      setState(() => age = newAge);
+      setState(() {
+        age = newAge;
+      });
     }
   }
 
@@ -77,6 +83,7 @@ class _OldScreenState extends State<OldScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(height: context.hp(9)),
+
           Align(
             alignment: Alignment.center,
             child: BounceInDown(
@@ -84,9 +91,11 @@ class _OldScreenState extends State<OldScreen> {
               child: const CircularPercentIndicatorWidget(index: 2),
             ),
           ),
+
           SizedBox(height: context.hp(3)),
+
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: const EdgeInsetsDirectional.only(start: 20),
             child: AnimationText(
               child: Text(
                 LocaleKeys.Authentication_howOldAreYou.tr(),
@@ -94,17 +103,21 @@ class _OldScreenState extends State<OldScreen> {
               ),
             ),
           ),
+
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: const EdgeInsetsDirectional.only(start: 20),
             child: AnimationText(
               millDelay: 1200,
               child: Text(
                 LocaleKeys.Authentication_goalDescription.tr(),
-                style: AppTheme.lightTheme.textTheme.titleMedium!.copyWith(fontSize: 16),
+                style: AppTheme.lightTheme.textTheme.titleMedium!
+                    .copyWith(fontSize: 16),
               ),
             ),
           ),
+
           SizedBox(height: context.hp(2)),
+
           SizedBox(
             width: double.infinity,
             height: context.hp(41),
@@ -119,6 +132,7 @@ class _OldScreenState extends State<OldScreen> {
                       fontSize: 10,
                     ),
                   ),
+
                   SizedBox(
                     height: context.hp(13),
                     child: ListView.builder(
@@ -133,13 +147,19 @@ class _OldScreenState extends State<OldScreen> {
                         }
 
                         final number = realIndex + 1;
+
                         final viewportCenter = _scrollController.offset +
                             MediaQuery.of(context).size.width / 2;
+
                         final itemCenter = index * itemWidth + itemWidth / 2;
 
-                        final distanceFromCenter = (viewportCenter - itemCenter).abs();
-                        final scale = (1.0 - (distanceFromCenter / (itemWidth * 4)))
+                        final distanceFromCenter =
+                        (viewportCenter - itemCenter).abs();
+
+                        final scale =
+                        (1.0 - (distanceFromCenter / (itemWidth * 4)))
                             .clamp(0.5, 1.0);
+
                         final fontSize = 36.0 * scale;
 
                         return Container(
@@ -149,23 +169,32 @@ class _OldScreenState extends State<OldScreen> {
                             number.toString(),
                             style: TextStyle(
                               fontSize: fontSize,
+                              fontWeight: FontWeight.w700,
                               color: number == age
                                   ? AppColors.orange
                                   : Colors.white.withAlpha(
-                                      (((1.1 - (distanceFromCenter / (itemWidth * 4)))
-                                                  .clamp(0.2, 1.0)) *
-                                              255)
-                                          .round(),
-                                    ),
-                              fontWeight: FontWeight.w700,
+                                (((1.1 -
+                                    (distanceFromCenter /
+                                        (itemWidth * 4)))
+                                    .clamp(0.2, 1.0)) *
+                                    255)
+                                    .round(),
+                              ),
                             ),
                           ),
                         );
                       },
                     ),
                   ),
-                  const Icon(Icons.arrow_drop_up, size: 50, color: AppColors.orange),
+
+                  const Icon(
+                    Icons.arrow_drop_up,
+                    size: 50,
+                    color: AppColors.orange,
+                  ),
+
                   const SizedBox(height: 24),
+
                   BounceInDown(
                     delay: const Duration(milliseconds: 700),
                     child: ElevatedButton(
@@ -174,6 +203,7 @@ class _OldScreenState extends State<OldScreen> {
                       ),
                       onPressed: () {
                         cubit.age = age;
+
                         widget.pageController.nextPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,

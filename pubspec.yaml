@@ -112,6 +112,7 @@ flutter:
     - assets/svg/
     - assets/translations/
     - assets/json/
+    - assets/lottie/
 
   fonts:
     - family: Baloo Thambi 2

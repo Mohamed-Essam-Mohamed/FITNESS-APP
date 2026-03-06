@@ -14,6 +14,7 @@ import 'package:fitness_app/generated/locale_keys.g.dart';
 class WeightScreen extends StatefulWidget {
   const WeightScreen({super.key, required this.pageController});
   final PageController pageController;
+
   @override
   State<WeightScreen> createState() => _WeightScreenState();
 }
@@ -70,7 +71,9 @@ class _WeightScreenState extends State<WeightScreen> {
 
   @override
   Widget build(BuildContext context) {
-    itemWidth = MediaQuery.of(context).size.width * 0.16;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    itemWidth = screenWidth * 0.16;
     final totalItems = numbersCount + paddingItems * 2;
 
     return SingleChildScrollView(
@@ -87,7 +90,7 @@ class _WeightScreenState extends State<WeightScreen> {
           ),
           SizedBox(height: context.hp(3)),
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
             child: AnimationText(
               child: Text(
                 LocaleKeys.Authentication_whatIsYourWeight.tr(),
@@ -96,12 +99,13 @@ class _WeightScreenState extends State<WeightScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 20),
+            padding: EdgeInsetsDirectional.only(start: screenWidth * 0.05),
             child: AnimationText(
               millDelay: 1200,
               child: Text(
                 LocaleKeys.Authentication_goalDescription.tr(),
-                style: AppTheme.lightTheme.textTheme.titleMedium!.copyWith(fontSize: 16),
+                style: AppTheme.lightTheme.textTheme.titleMedium!
+                    .copyWith(fontSize: screenHeight * 0.022),
               ),
             ),
           ),
@@ -114,7 +118,7 @@ class _WeightScreenState extends State<WeightScreen> {
                   'Kg',
                   style: AppTheme.lightTheme.textTheme.bodySmall!.copyWith(
                     color: AppColors.orange,
-                    fontSize: 10,
+                    fontSize: screenHeight * 0.015,
                   ),
                 ),
                 SizedBox(
@@ -130,12 +134,10 @@ class _WeightScreenState extends State<WeightScreen> {
                       }
 
                       final number = realIndex + 1;
-                      final viewportCenter = _scrollController.offset +
-                          MediaQuery.of(context).size.width / 2;
+                      final viewportCenter = _scrollController.offset + screenWidth / 2;
                       final itemCenter = index * itemWidth + itemWidth / 2;
                       final distanceFromCenter = (viewportCenter - itemCenter).abs();
-                      final scale =
-                          (1.0 - (distanceFromCenter / (itemWidth * 4))).clamp(0.5, 1.0);
+                      final scale = (1.0 - (distanceFromCenter / (itemWidth * 4))).clamp(0.5, 1.0);
                       final fontSize = 36.0 * scale;
 
                       return Container(
@@ -149,39 +151,42 @@ class _WeightScreenState extends State<WeightScreen> {
                             color: number == weight
                                 ? AppColors.orange
                                 : Colors.white.withAlpha(
-                                    (((1.1 - (distanceFromCenter / (itemWidth * 4)))
-                                                .clamp(0.2, 1.0)) *
-                                            255)
-                                        .round(),
-                                  ),
+                              (((1.1 - (distanceFromCenter / (itemWidth * 4))).clamp(0.2, 1.0)) *
+                                  255)
+                                  .round(),
+                            ),
                           ),
                         ),
                       );
                     },
                   ),
                 ),
-                const Icon(
+                Icon(
                   Icons.arrow_drop_up,
-                  size: 50,
+                  size: screenHeight * 0.07,
                   color: AppColors.orange,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: screenHeight * 0.03),
                 BounceInDown(
                   delay: const Duration(milliseconds: 700),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(38),
+                      minimumSize: Size(double.infinity, screenHeight * 0.06),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                        borderRadius: BorderRadius.circular(screenHeight * 0.03),
                       ),
                     ),
                     onPressed: () {
+                      cubit.weight = weight;
                       widget.pageController.nextPage(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                       );
                     },
-                    child: Text(LocaleKeys.Authentication_next.tr()),
+                    child: Text(
+                      LocaleKeys.Authentication_next.tr(),
+                      style: AppTheme.lightTheme.textTheme.labelLarge,
+                    ),
                   ),
                 )
               ],
