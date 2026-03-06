@@ -27,6 +27,27 @@ class ChangePasswordScreen extends StatefulWidget {
 }
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+  late TextEditingController _emailController; // جديد
+  late TextEditingController _newPasswordController;
+  late TextEditingController _confirmPasswordController;
+  var formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    _emailController = TextEditingController(); // جديد
+    _newPasswordController = TextEditingController();
+    _confirmPasswordController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose(); // جديد
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final cubit = BlocProvider.of<ForgetPasswordCubit>(context);
@@ -49,8 +70,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     description: 'password changed successfully',
                     type: ToastificationType.success,
                   );
-                  //           context.pop();
-                  //!  navigate to home
                 }
                 if (state.isChangeFailure) {
                   context.pop();
@@ -95,6 +114,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       child: Column(
                         spacing: 24,
                         children: [
+                          /// --- حقل الإيميل الجديد ---
+                          TextFormWidget(
+                            controller: _emailController,
+                            validator: Validator.validateEmail,
+                            prefixIcon: SvgAsset.mail,
+                            hintText: LocaleKeys.Authentication_Email.tr(), suffixIcon: '',
+                            obscureText: false,
+                          ),
+
                           TextFormWidget(
                             controller: _newPasswordController,
                             validator: Validator.validatePassword,
@@ -125,6 +153,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                 if (formKey.currentState!.validate()) {
                                   cubit.doIntend(ForgetPasswordIntent(
                                     status: ForgetPasswordStatus.changePassword,
+                                    email: _emailController.text, // مرسل الإيميل
                                     password: _newPasswordController.text,
                                   ));
                                 }
@@ -143,23 +172,5 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         ),
       ),
     );
-  }
-
-  late TextEditingController _newPasswordController;
-  late TextEditingController _confirmPasswordController;
-  var formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    _newPasswordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
   }
 }

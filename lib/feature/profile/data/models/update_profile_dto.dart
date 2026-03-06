@@ -9,13 +9,17 @@ class UpdateProfileDto {
       required this.email,
       required this.weight,
       required this.activityLevel,
-      required this.goal});
+      required this.goal, required this.height, required this.age});
 
   final String firstName;
   final String lastName;
   final String email;
 
   final int weight;
+  final int height;
+  final int age;
+
+
   final String activityLevel;
   final String goal;
 

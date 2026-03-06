@@ -28,7 +28,7 @@ class ForgetPasswordCubit extends Cubit<ForgetPasswordState> {
       case ForgetPasswordStatus.verifyCode:
         await _verifyCode(code: intent.code!);
       case ForgetPasswordStatus.changePassword:
-        await _changePassword(password: intent.password!);
+        await _changePassword(password: intent.password!, email: intent.email!);
     }
   }
 
@@ -66,10 +66,10 @@ class ForgetPasswordCubit extends Cubit<ForgetPasswordState> {
     }
   }
 
-  Future<void> _changePassword({required String password}) async {
+  Future<void> _changePassword({required String email, required String password}) async {
     emit(state.copyWith(statusChangePassword: Status.loading));
     final result =
-        await _changePasswordUseCase.call(email: state.email, password: password);
+        await _changePasswordUseCase.call(email: email, password: password);
 
     switch (result) {
       case SuccessResult<ChangePasswordEntity>():

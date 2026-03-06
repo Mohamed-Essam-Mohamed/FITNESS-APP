@@ -42,8 +42,8 @@ class RouteGenerator {
         );
       case Routes.changePassword:
         return AnimationRoute(
-          page: BlocProvider.value(
-            value: arg as ForgetPasswordCubit,
+          page: BlocProvider<ForgetPasswordCubit>(
+            create: (context) => serviceLocator<ForgetPasswordCubit>(),
             child: const ChangePasswordScreen(),
           ),
         );
@@ -87,7 +87,7 @@ class RouteGenerator {
         final editProfileScreenArgs = arg as ProfileCubit;
         return AnimationRoute(
           page: EditProfileScreen(
-            profileCubit: editProfileScreenArgs,
+
           ),
         );
 

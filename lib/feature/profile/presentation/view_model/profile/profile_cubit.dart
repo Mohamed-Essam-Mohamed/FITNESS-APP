@@ -17,27 +17,33 @@ part 'profile_state.dart';
 @injectable
 class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit(
-    this._getDataProfileUseCase,
-    this._updateDataProfileUseCase,
-    this._updateProfilePhoto,
-  ) : super(const ProfileState());
+      this._getDataProfileUseCase,
+      this._updateDataProfileUseCase,
+      this._updateProfilePhoto,
+      ) : super(const ProfileState());
+
   final GetDataProfileUseCase _getDataProfileUseCase;
   final UpdateDataProfileUseCase _updateDataProfileUseCase;
   final UpdateProfilePhoto _updateProfilePhoto;
 
-  ///variable
+  /// TextEditingControllers
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController goalController = TextEditingController();
+  final TextEditingController activityLevelController = TextEditingController();
 
   File? photo;
+
   Future<void> doIntend(ProfileAction action) async {
     switch (action) {
       case GetDataProfileAction():
         await _getProfile();
       case UpdateDataProfileAction():
         await _updateProfile();
-
       case UpdateProfilePhotoAction():
         await _updatePhoto(action.photo);
     }
@@ -49,16 +55,20 @@ class ProfileCubit extends Cubit<ProfileState> {
 
     switch (result) {
       case SuccessResult<GetProfileEntity>():
-        {
-          firstNameController.text = result.data.user.firstName;
-          lastNameController.text = result.data.user.lastName;
-          emailController.text = result.data.user.email;
-          emit(state.copyWith(
-            getProfileStatus: Status.success,
-            dataUserEntity: result.data.user,
-            errorMessage: null,
-          ));
-        }
+        firstNameController.text = result.data.user.firstName;
+        lastNameController.text = result.data.user.lastName;
+        emailController.text = result.data.user.email;
+        weightController.text = result.data.user.weight.toString();
+        heightController.text = result.data.user.height.toString();
+        ageController.text = result.data.user.age.toString();
+        goalController.text = result.data.user.goal;
+        activityLevelController.text = result.data.user.activityLevel;
+
+        emit(state.copyWith(
+          getProfileStatus: Status.success,
+          dataUserEntity: result.data.user,
+          errorMessage: null,
+        ));
 
       case FailureResult<GetProfileEntity>():
         emit(state.copyWith(
@@ -73,12 +83,14 @@ class ProfileCubit extends Cubit<ProfileState> {
       firstName: firstNameController.text.trim(),
       lastName: lastNameController.text.trim(),
       email: emailController.text.trim(),
+      weight: int.tryParse(weightController.text.trim()) ?? state.dataUserEntity.weight,
+      height: int.tryParse(heightController.text.trim()) ?? state.dataUserEntity.height,
+      age: int.tryParse(ageController.text.trim()) ?? state.dataUserEntity.age,
+      goal: goalController.text.trim(),
+      activityLevel: activityLevelController.text.trim(),
     );
 
     final oldDataUserUpdate = state.dataUserEntity;
-    if (oldDataUserUpdate == newDataUserUpdate) {
-      return;
-    }
 
     emit(state.copyWith(
       updateProfileStatus: Status.loading,
@@ -88,49 +100,59 @@ class ProfileCubit extends Cubit<ProfileState> {
     ));
 
     final updateData = UpdateProfileEntity(
-      firstName: firstNameController.text,
-      lastName: lastNameController.text,
-      email: emailController.text,
-      weight: 110,
-      activityLevel: 'level1',
-      goal: 'Gain weight',
+      firstName: firstNameController.text.trim(),
+      lastName: lastNameController.text.trim(),
+      email: emailController.text.trim(),
+      weight: int.tryParse(weightController.text.trim()) ?? state.dataUserEntity.weight,
+      height: int.tryParse(heightController.text.trim()) ?? state.dataUserEntity.height,
+      age: int.tryParse(ageController.text.trim()) ?? state.dataUserEntity.age,
+      goal: goalController.text.trim(),
+      activityLevel: activityLevelController.text.trim(),
     );
+
     final result = await _updateDataProfileUseCase(updateData);
+
     switch (result) {
       case SuccessResult():
-        {
-          emit(state.copyWith(
-            updateProfileStatus: Status.success,
-            successMessage: result.data.message,
-          ));
-          await _getDataProfileUseCase.call();
-        }
+        emit(state.copyWith(
+          updateProfileStatus: Status.success,
+          successMessage: result.data.message,
+        ));
+
+        await _getProfile();
+
       case FailureResult():
-        {
-          firstNameController.text = oldDataUserUpdate.firstName;
-          lastNameController.text = oldDataUserUpdate.lastName;
-          emailController.text = oldDataUserUpdate.email;
-          emit(state.copyWith(
-            updateProfileStatus: Status.failure,
-            dataUserEntity: oldDataUserUpdate,
-            errorMessage: Helper.getMessageFromException(result.exception),
-          ));
-        }
+        firstNameController.text = oldDataUserUpdate.firstName;
+        lastNameController.text = oldDataUserUpdate.lastName;
+        emailController.text = oldDataUserUpdate.email;
+        weightController.text = oldDataUserUpdate.weight.toString();
+        heightController.text = oldDataUserUpdate.height.toString();
+        ageController.text = oldDataUserUpdate.age.toString();
+        goalController.text = oldDataUserUpdate.goal;
+        activityLevelController.text = oldDataUserUpdate.activityLevel;
+
+        emit(state.copyWith(
+          updateProfileStatus: Status.failure,
+          dataUserEntity: oldDataUserUpdate,
+          errorMessage: Helper.getMessageFromException(result.exception),
+        ));
     }
   }
 
   Future<void> _updatePhoto(File photo) async {
+    // أولاً عرض الصورة اللي اختارها المستخدم
     emit(state.copyWith(
+      localPhoto: photo,
       profilePhotoStatus: Status.loading,
       errorMessage: null,
       successMessage: null,
     ));
 
     final result = await _updateProfilePhoto(photo);
+
     switch (result) {
       case SuccessResult():
         _getProfileOptimistic(result.data);
-
       case FailureResult():
         emit(state.copyWith(
           profilePhotoStatus: Status.failure,
@@ -138,7 +160,6 @@ class ProfileCubit extends Cubit<ProfileState> {
         ));
     }
   }
-
   Future<void> _getProfileOptimistic(String message) async {
     final result = await _getDataProfileUseCase.call();
     switch (result) {

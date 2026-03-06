@@ -3,6 +3,7 @@ part of 'profile_cubit.dart';
 class ProfileState extends Equatable {
   const ProfileState({
     this.dataUserEntity = const DataUserEntity(),
+    this.localPhoto,
     this.errorMessage = '',
     this.getProfileStatus = Status.initial,
     this.updateProfileStatus = Status.initial,
@@ -12,6 +13,7 @@ class ProfileState extends Equatable {
   });
 
   final DataUserEntity dataUserEntity;
+  final File? localPhoto; // <-- أضفنا الحقل ده
   final String errorMessage;
   final Status getProfileStatus;
   final Status updateProfileStatus;
@@ -21,6 +23,7 @@ class ProfileState extends Equatable {
 
   ProfileState copyWith({
     DataUserEntity? dataUserEntity,
+    File? localPhoto, // <-- copyWith يدعم localPhoto
     String? errorMessage,
     Status? getProfileStatus,
     Status? updateProfileStatus,
@@ -28,24 +31,26 @@ class ProfileState extends Equatable {
     String? successMessage,
   }) =>
       ProfileState(
-          successMessage: successMessage ?? this.successMessage,
-          profilePhotoStatus: profilePhotoStatus ?? this.profilePhotoStatus,
-          dataUserEntity: dataUserEntity ?? this.dataUserEntity,
-          errorMessage: errorMessage ?? this.errorMessage,
-          getProfileStatus: getProfileStatus ?? this.getProfileStatus,
-          updateProfileStatus: updateProfileStatus ?? this.updateProfileStatus);
+        successMessage: successMessage ?? this.successMessage,
+        profilePhotoStatus: profilePhotoStatus ?? this.profilePhotoStatus,
+        dataUserEntity: dataUserEntity ?? this.dataUserEntity,
+        localPhoto: localPhoto ?? this.localPhoto,
+        errorMessage: errorMessage ?? this.errorMessage,
+        getProfileStatus: getProfileStatus ?? this.getProfileStatus,
+        updateProfileStatus: updateProfileStatus ?? this.updateProfileStatus,
+      );
 
   @override
-  List<Object> get props => [
-        dataUserEntity,
-        errorMessage,
-        getProfileStatus,
-        updateProfileStatus,
-        profilePhotoStatus,
-        successMessage
-      ];
+  List<Object?> get props => [
+    dataUserEntity,
+    localPhoto,
+    errorMessage,
+    getProfileStatus,
+    updateProfileStatus,
+    profilePhotoStatus,
+    successMessage
+  ];
 }
-
 sealed class ProfileAction {}
 
 class GetDataProfileAction extends ProfileAction {}

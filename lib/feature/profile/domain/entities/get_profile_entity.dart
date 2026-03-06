@@ -45,7 +45,11 @@ class DataUserEntity extends Equatable {
     String? email,
     int? age,
     int? weight,
+    int? height,
+    String? goal,
     String? activityLevel,
+    String? photo,
+
   }) {
     return DataUserEntity(
         firstName: firstName ?? this.firstName,
@@ -57,9 +61,9 @@ class DataUserEntity extends Equatable {
         id: id,
         createdAt: createdAt,
         gender: gender,
-        goal: goal,
-        height: height,
-        photo: photo);
+        goal: goal??this.goal,
+        height: height??this.height,
+        photo: photo??this.photo);
   }
 
   @override

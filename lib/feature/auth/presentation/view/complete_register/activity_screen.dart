@@ -64,6 +64,12 @@ class _ActivityScreenState extends State<ActivityScreen> {
             }
           });
         } else if (state.status == RegisterStatus.success) {
+          AppToast.showToast(
+            context: context,
+            title: 'Successfully create account758741',
+
+            type: ToastificationType.success, description: '',
+          );
           context.pop();
           context.pushNamedAndRemoveUntil(Routes.login);
         } else if (state.status == RegisterStatus.loading) {
